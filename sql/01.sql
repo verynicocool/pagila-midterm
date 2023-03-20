@@ -12,3 +12,34 @@
  * NOTE:
  * Your results should not contain any duplicate titles.
  */
+SELECT DISTINCT title
+FROM film
+WHERE film_id NOT IN 
+              (SELECT film_id
+               FROM film
+               WHERE title ILIKE '%f%'
+               UNION (
+               SELECT film_id
+               FROM film
+               JOIN film_actor USING (film_id)
+               JOIN actor USING (actor_id)
+               WHERE first_name ILIKE '%f%' OR last_name ILIKE '%f%') 
+               UNION (
+               SELECT film_id
+               FROM film
+               JOIN inventory USING (film_id)
+               JOIN rental USING (inventory_id)
+               JOIN customer USING (customer_id)
+               WHERE first_name ILIKE '%f%' OR last_name ILIKE '%f%')  
+               UNION (
+               SELECT film_id
+               FROM film
+               JOIN inventory USING (film_id)
+               JOIN rental USING (inventory_id)
+               JOIN customer USING (customer_id)
+               JOIN address USING (address_id)
+               JOIN city USING (city_id)
+               JOIN country USING (country_id)
+               WHERE address ILIKE '%f%' OR address2 ILIKE '%f%'
+               OR city ILIKE '%f%' OR country ILIKE '%f%'))
+ORDER BY title;    
